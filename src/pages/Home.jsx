@@ -15,7 +15,7 @@ export default function Home() {
   const currentReflections = reflections.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(reflections.length / reflectionsPerPage);
 
-  const crisisKeywords = /(hopeless|suicidal|overwhelmed|worthless|panic attack|can't cope|heart racing|can't breathe)/i;
+  const crisisKeywords = /(hopeless|suicidal|overwhelmed|worthless|panic attack|can't cope|heart racing|can't breathe|uncontrollable crying|despair|helpless|hurting myself|dark thoughts|numb|isolated|anxious|severe anxiety|depressed|panic|scared|can't sleep|paranoia|fearful)/i;
 
   const getAISummary = (text) => {
     const lowerText = text.toLowerCase();
@@ -55,10 +55,15 @@ export default function Home() {
       setTimeout(() => {
         setShowCrisisAlert(true);
       }, 100);
+
+      const userData = JSON.parse(localStorage.getItem('aid_user'));
+      if (userData?.trustedContact?.contactEmail) {
+        console.log(`Auto-sending SOS email to ${userData.trustedContact.contactEmail}`);
+        // Placeholder for actual email logic
+      }
     }
   };
 
-  // Auto-hide alert after 8 seconds
   useEffect(() => {
     if (showCrisisAlert) {
       const timer = setTimeout(() => {
@@ -73,7 +78,6 @@ export default function Home() {
 
       <ParticlesBackground />
 
-      {/* Contact Therapist Button - Top Left */}
       <Link
         to="/contact"
         className="fixed left-4 top-4 sm:left-6 sm:top-6 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 via-red-500 to-purple-700 text-white shadow-lg hover:scale-105 transition-transform z-20"
@@ -81,7 +85,6 @@ export default function Home() {
         Contact Therapist
       </Link>
 
-      {/* Discreet Crisis Alert */}
       {showCrisisAlert && (
         <div className="fixed right-4 top-4 sm:right-6 sm:top-6 bg-red-700/90 text-white px-4 py-2 rounded-lg shadow-lg z-30 flex items-center space-x-3 animate-pulse">
           <span className="text-2xl">🚨</span>
@@ -93,7 +96,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Reflection Input Container */}
       <div className="mt-24 p-6 bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl max-w-md w-[85%] text-center border border-purple-500 space-y-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-purple-300 mb-4">
           How are you feeling today?
@@ -114,7 +116,6 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Reflections Grid */}
       <div className="mt-8 w-[90%] max-w-5xl p-4 bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl border border-purple-500 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-center items-center overflow-y-auto max-h-[60vh]">
         {currentReflections.length === 0 ? (
           <p className="col-span-full text-white/60 italic text-center">
@@ -127,7 +128,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* Pagination Controls */}
       {totalPages > 1 && (
         <div className="fixed bottom-4 flex justify-center space-x-2">
           {Array.from({ length: totalPages }, (_, i) => (

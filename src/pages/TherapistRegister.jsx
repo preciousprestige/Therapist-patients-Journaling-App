@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function TherapistRegister() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const navigate = useNavigate();
 
   const handleRegister = (e) => {
     e.preventDefault();
-    // TODO: Handle therapist registration logic (API call or storage)
     console.log({ fullName, email, password });
+    localStorage.setItem('aid_therapist', JSON.stringify({ fullName, email }));
+    navigate('/therapist');
   };
 
   return (

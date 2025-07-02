@@ -5,6 +5,7 @@ export default function Register() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [pin, setPin] = useState('');
 
   // Trusted Contact
   const [contactName, setContactName] = useState('');
@@ -16,9 +17,9 @@ export default function Register() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hasVisited = localStorage.getItem('aid_visited');
-    if (hasVisited) {
-      navigate('/login');  // Skip Welcome if already registered
+    const registered = localStorage.getItem('aid_registered');
+    if (registered) {
+      navigate('/pin');  // Existing user goes to PIN unlock
     }
   }, [navigate]);
 
@@ -29,10 +30,14 @@ export default function Register() {
   const handleRegister = (e) => {
     e.preventDefault();
 
+    if (!fullName || !email || !password || pin.length !== 4) {
+      alert('Fill all fields and use a 4-digit PIN');
+      return;
+    }
+
     const data = {
       fullName,
       email,
-      password,
       trustedContact: {
         contactName,
         relationship,
@@ -43,8 +48,11 @@ export default function Register() {
     };
 
     console.log('Patient Registered:', data);
-    localStorage.setItem('aid_visited', 'true');
-    // Optional: Save to backend/localStorage
+
+    localStorage.setItem('aid_registered', 'true');
+    localStorage.setItem('aid_user', JSON.stringify(data));
+    localStorage.setItem('aid_pin', pin);
+
     navigate('/home');
   };
 
@@ -85,6 +93,16 @@ export default function Register() {
           placeholder="Create Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="4-digit Passcode"
+          value={pin}
+          maxLength={4}
+          onChange={(e) => setPin(e.target.value)}
           className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
           required
         />

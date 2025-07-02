@@ -1,23 +1,27 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import Home from './pages/Home';
 import TherapistPortal from './pages/TherapistPortal';
 import ContactTherapist from './components/ContactTherapist';
-import ParticlesBackground from './components/ParticlesBackground';
+import Login from './pages/Login';
+import Resources from './pages/Resources';
+import Register from './pages/Register';
+import TherapistRegister from './pages/TherapistRegister';
+import Welcome from './pages/Welcome';
 
 export default function App() {
   return (
-    <Router>
-      <div className="relative min-h-screen bg-gradient-to-br from-slate-900 to-purple-950 text-white">
-        
-        <ParticlesBackground />
-
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/contact" element={<ContactTherapist />} />
-          <Route path="/therapist" element={<TherapistPortal />} />
-        </Routes>
-        
-      </div>
-    </Router>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Welcome />} />
+        <Route path="/" element={<Welcome />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/therapist-login" element={<TherapistPortal />} />
+        <Route path="/therapist-register" element={<TherapistRegister />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/contact" element={<ContactTherapist />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

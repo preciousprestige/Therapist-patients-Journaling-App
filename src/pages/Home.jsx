@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReflectionCard from '../components/ReflectionCard';
 import { Link } from 'react-router-dom';
 import ParticlesBackground from '../components/ParticlesBackground';
+import ChatBox from '../components/ChatBox';
 
 export default function Home() {
   const [reflections, setReflections] = useState([]);
@@ -9,6 +10,10 @@ export default function Home() {
   const reflectionsPerPage = 5;
   const [note, setNote] = useState('');
   const [showCrisisAlert, setShowCrisisAlert] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+
+  const userData = JSON.parse(localStorage.getItem('aid_user'));
+  const patientName = userData?.fullName || 'John D.';
 
   const indexOfLast = currentPage * reflectionsPerPage;
   const indexOfFirst = indexOfLast - reflectionsPerPage;
@@ -52,23 +57,18 @@ export default function Home() {
     setNote('');
 
     if (isCrisis) {
-      setTimeout(() => {
-        setShowCrisisAlert(true);
-      }, 100);
+      setTimeout(() => setShowCrisisAlert(true), 100);
 
-      const userData = JSON.parse(localStorage.getItem('aid_user'));
       if (userData?.trustedContact?.contactEmail) {
-        console.log(`Auto-sending SOS email to ${userData.trustedContact.contactEmail}`);
-        // Placeholder for actual email logic
+        console.log(`🚨 SOS simulated: Email sent to ${userData.trustedContact.contactEmail}`);
+        alert(`SOS simulated: Email sent to ${userData.trustedContact.contactEmail}`);
       }
     }
   };
 
   useEffect(() => {
     if (showCrisisAlert) {
-      const timer = setTimeout(() => {
-        setShowCrisisAlert(false);
-      }, 8000);
+      const timer = setTimeout(() => setShowCrisisAlert(false), 8000);
       return () => clearTimeout(timer);
     }
   }, [showCrisisAlert]);
@@ -134,14 +134,28 @@ export default function Home() {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`w-6 h-6 rounded-full text-sm ${
-                currentPage === i + 1 ? 'bg-purple-700' : 'bg-white/10'
-              }`}
+              className={`w-6 h-6 rounded-full text-sm ${currentPage === i + 1 ? 'bg-purple-700' : 'bg-white/10'}`}
             >
               {i + 1}
             </button>
           ))}
         </div>
+      )}
+
+      <button
+        onClick={() => setShowChat(true)}
+        className="fixed bottom-4 right-4 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 via-red-500 to-purple-700 text-white shadow-lg hover:scale-105 transition-transform"
+      >
+        💬 Chat
+      </button>
+
+      {showChat && (
+        <ChatBox
+          user="Therapist"
+          pov="patient"
+          storageKey={`chat_${patientName}`}
+          onClose={() => setShowChat(false)}
+        />
       )}
     </div>
   );

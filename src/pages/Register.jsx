@@ -5,9 +5,6 @@ export default function Register() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [pin, setPin] = useState('');
-
-  // Trusted Contact
   const [contactName, setContactName] = useState('');
   const [relationship, setRelationship] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -17,9 +14,9 @@ export default function Register() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const registered = localStorage.getItem('aid_registered');
-    if (registered) {
-      navigate('/pin');  // Existing user goes to PIN unlock
+    const hasVisited = localStorage.getItem('aid_visited');
+    if (hasVisited) {
+      navigate('/login');
     }
   }, [navigate]);
 
@@ -30,14 +27,10 @@ export default function Register() {
   const handleRegister = (e) => {
     e.preventDefault();
 
-    if (!fullName || !email || !password || pin.length !== 4) {
-      alert('Fill all fields and use a 4-digit PIN');
-      return;
-    }
-
     const data = {
       fullName,
       email,
+      password,
       trustedContact: {
         contactName,
         relationship,
@@ -47,18 +40,13 @@ export default function Register() {
       },
     };
 
-    console.log('Patient Registered:', data);
-
-    localStorage.setItem('aid_registered', 'true');
-    localStorage.setItem('aid_user', JSON.stringify(data));
-    localStorage.setItem('aid_pin', pin);
-
+    localStorage.setItem('aid_visited', 'true');
+    localStorage.setItem('aid_visited_data', JSON.stringify(data));
     navigate('/home');
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-900 via-purple-950 to-black text-white p-4">
-
       <h1 className="text-3xl font-bold text-purple-300 mb-6">Patient Registration</h1>
 
       <button
@@ -70,99 +58,30 @@ export default function Register() {
 
       <form onSubmit={handleRegister} className="space-y-4 bg-white/10 backdrop-blur-md p-6 rounded-3xl shadow-2xl max-w-md w-full border border-purple-500">
 
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
-          required
-        />
+        <input type="text" placeholder="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500" required />
 
-        <input
-          type="email"
-          placeholder="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
-          required
-        />
+        <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500" required />
 
-        <input
-          type="password"
-          placeholder="Create Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="4-digit Passcode"
-          value={pin}
-          maxLength={4}
-          onChange={(e) => setPin(e.target.value)}
-          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
-          required
-        />
+        <input type="password" placeholder="Create Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500" required />
 
         <h2 className="text-purple-300 font-bold mt-4">Trusted Contact (For SOS)</h2>
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={contactName}
-          onChange={(e) => setContactName(e.target.value)}
-          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
-          required
-        />
+        <input type="text" placeholder="Name" value={contactName} onChange={(e) => setContactName(e.target.value)} className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500" required />
 
-        <input
-          type="text"
-          placeholder="Relationship (e.g., Friend, Parent)"
-          value={relationship}
-          onChange={(e) => setRelationship(e.target.value)}
-          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
-          required
-        />
+        <input type="text" placeholder="Relationship" value={relationship} onChange={(e) => setRelationship(e.target.value)} className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500" required />
 
-        <input
-          type="email"
-          placeholder="Contact Email"
-          value={contactEmail}
-          onChange={(e) => setContactEmail(e.target.value)}
-          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
-          required
-        />
+        <input type="email" placeholder="Contact Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500" required />
 
-        <input
-          type="tel"
-          placeholder="Contact Number"
-          value={contactNumber}
-          onChange={(e) => setContactNumber(e.target.value)}
-          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
-        />
+        <input type="tel" placeholder="Contact Number" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500" />
 
-        <input
-          type="text"
-          placeholder="Home Address"
-          value={contactAddress}
-          onChange={(e) => setContactAddress(e.target.value)}
-          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
-        />
+        <input type="text" placeholder="Home Address" value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500" />
 
-        <button
-          type="submit"
-          className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 via-red-500 to-purple-700 text-white hover:scale-105 transition-transform"
-        >
+        <button type="submit" className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 via-red-500 to-purple-700 text-white hover:scale-105 transition-transform">
           Complete Registration
         </button>
-
       </form>
 
       <Link to="/" className="mt-6 text-purple-300 underline">Back to Login</Link>
-
     </div>
   );
 }

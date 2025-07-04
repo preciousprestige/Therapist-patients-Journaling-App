@@ -9,9 +9,14 @@ export default function TherapistRegister() {
 
   const handleRegister = (e) => {
     e.preventDefault();
-    console.log({ fullName, email, password });
-    localStorage.setItem('aid_therapist', JSON.stringify({ fullName, email }));
-    navigate('/therapist');
+
+    const therapistData = { fullName, email, password };
+
+    console.log('Therapist Registered:', therapistData);
+
+    localStorage.setItem('aid_therapist', JSON.stringify(therapistData));
+
+    navigate('/therapist-login');
   };
 
   return (

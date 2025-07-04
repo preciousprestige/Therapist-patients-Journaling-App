@@ -1,70 +1,63 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import ParticlesBackground from '../components/ParticlesBackground';
+import { useNavigate } from 'react-router-dom';
 
 export default function TherapistPortal() {
-  const [authenticated, setAuthenticated] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  if (!authenticated) {
-    return (
-      <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-950 to-black text-white">
-        <ParticlesBackground />
+  const handleLogin = (e) => {
+    e.preventDefault();
 
-        <div className="p-8 bg-white/10 backdrop-blur-md rounded-xl shadow-2xl max-w-md w-[90%] text-center space-y-6 border border-purple-500">
-          <h1 className="text-3xl sm:text-4xl font-bold text-purple-300">
-            Therapist Login
-          </h1>
-          <p className="text-white/70">Access patient reflections securely.</p>
+    const stored = localStorage.getItem('aid_therapist');
+    if (!stored) {
+      alert('No therapist registered. Please register first.');
+      return;
+    }
 
-          <button
-            onClick={() => setAuthenticated(true)}
-            className="px-6 py-2 mt-4 rounded-lg bg-gradient-to-r from-purple-600 via-red-500 to-purple-700 text-white shadow-lg hover:scale-105 transition-transform"
-          >
-            Simulate Login
-          </button>
+    const therapist = JSON.parse(stored);
 
-          <Link to="/" className="block mt-4 text-purple-300 hover:underline">
-            Back to Home
-          </Link>
-        </div>
-      </div>
-    );
-  }
+    if (email === therapist.email && password === therapist.password) {
+      console.log('Therapist authenticated');
+      navigate('/therapist-dashboard');
+    } else {
+      alert('Invalid credentials');
+    }
+  };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden bg-gradient-to-br from-slate-900 via-purple-950 to-black text-white">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-900 via-purple-950 to-black text-white p-4">
 
-      {/* Floating particles */}
-      <ParticlesBackground />
+      <h1 className="text-3xl font-bold text-purple-300 mb-6">Therapist Login</h1>
 
-      {/* Glass morphism container */}
-      <div className="mt-24 mb-16 p-8 bg-white/10 backdrop-blur-md rounded-xl shadow-2xl max-w-4xl w-[90%] text-center space-y-6 border border-purple-500">
+      <form onSubmit={handleLogin} className="space-y-4 bg-white/10 backdrop-blur-md p-6 rounded-3xl shadow-2xl max-w-md w-full border border-purple-500">
 
-        <h1 className="text-4xl sm:text-5xl font-bold text-purple-300">
-          Therapist Portal
-        </h1>
+        <input
+          type="email"
+          placeholder="Email Address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
+          required
+        />
 
-        <p className="text-white/70 text-lg">
-          View patient reflections and wellness progress.
-        </p>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 rounded bg-white/10 backdrop-blur text-white border border-purple-500 focus:outline-none"
+          required
+        />
 
-        <div className="flex flex-wrap justify-center gap-4">
-          <Link 
-            to="/" 
-            className="px-6 py-2 rounded-lg bg-gradient-to-r from-purple-600 via-red-500 to-purple-700 text-white shadow-lg hover:scale-105 transition-transform"
-          >
-            Back to Home
-          </Link>
-        </div>
-      </div>
+        <button
+          type="submit"
+          className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 via-red-500 to-purple-700 text-white hover:scale-105 transition-transform"
+        >
+          Login
+        </button>
 
-      {/* Placeholder for reflections list */}
-      <div className="max-w-6xl w-full px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
-        <p className="text-center col-span-full text-white/60 italic">
-          No patient reflections yet. This will show submitted journals.
-        </p>
-      </div>
-
+      </form>
     </div>
   );
 }

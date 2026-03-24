@@ -11,7 +11,6 @@ export default function PatientChooseTherapist() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState('');
   const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -25,7 +24,7 @@ export default function PatientChooseTherapist() {
   }, []);
 
   const handleSelect = async (therapistId) => {
-    setSaving(therapistId); setSuccess(''); setError('');
+    setSaving(therapistId); setSuccess('');
     try {
       await api.put('/users/choose-therapist', { therapistId });
       setCurrent(therapistId);
@@ -33,9 +32,7 @@ export default function PatientChooseTherapist() {
       localStorage.setItem('user', JSON.stringify(updated));
       setSuccess(therapistId);
       setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to select therapist');
-    }
+    } catch { }
     setSaving('');
   };
 
@@ -45,8 +42,6 @@ export default function PatientChooseTherapist() {
         <h1 className="font-display text-2xl font-bold text-stone-800">Choose Your Therapist</h1>
         <p className="text-stone-500 text-sm mt-1">Select the therapist you'd like to work with</p>
       </div>
-
-      {error && <div className="bg-blush-50 border border-blush-200 text-blush-700 text-sm px-4 py-3 rounded-xl mb-4">{error}</div>}
 
       {current && (
         <div className="bg-sage-50 border border-sage-200 rounded-2xl p-4 mb-6 flex items-center gap-3">

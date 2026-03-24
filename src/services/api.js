@@ -72,3 +72,17 @@ export const usersAPI = {
 };
 
 export default api;
+
+// Ratings
+export const ratingsAPI = {
+  submit: (data) => api.post('/ratings', data),
+  getMyRating: () => api.get('/ratings/my'),
+  getTherapistRatings: (id) => api.get(`/ratings/therapist/${id}`),
+};
+
+// Care Packages
+export const carePackageAPI = {
+  send: (data) => api.post('/care-packages', data),
+  getMy: () => api.get('/care-packages/my'),
+  markRead: (id) => api.put(`/care-packages/${id}/read`),
+};

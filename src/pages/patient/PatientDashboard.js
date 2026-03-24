@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { journalAPI, moodAPI, notesAPI } from '../../services/api';
+import { journalAPI, moodAPI, notesAPI, carePackageAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { RiGiftLine, RiCheckLine } from 'react-icons/ri';
 
 const MOOD_EMOJI = { great: '😄', good: '🙂', okay: '😐', low: '😔', terrible: '😢' };
 
@@ -10,20 +11,33 @@ export default function PatientDashboard() {
   const [journals, setJournals] = useState([]);
   const [moods, setMoods] = useState([]);
   const [notes, setNotes] = useState([]);
+  const [carePackages, setCarePackages] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [j, m, n] = await Promise.all([journalAPI.getAll(), moodAPI.getAll(), notesAPI.getAll()]);
-        setJournals(j.data || []); setMoods(m.data || []); setNotes(n.data || []);
+        const [j, m, n, cp] = await Promise.all([
+          journalAPI.getAll(), moodAPI.getAll(), notesAPI.getAll(), carePackageAPI.getMy()
+        ]);
+        setJournals(j.data || []); setMoods(m.data || []);
+        setNotes(n.data || []); setCarePackages(cp.data || []);
       } catch { }
       setLoading(false);
     };
     load();
   }, []);
 
-  const latestMood = moods[0];
+  const unreadPackages = carePackages.filter(p => !p.read);
+
+  const handleReadPackage = async (id) => {
+    try {
+      await carePackageAPI.markRead(id);
+      setCarePackages(prev => prev.map(p => p._id === id ? { ...p, read: true } : p));
+    } catch { }
+  };
+
+  const upcomingAppts = [];
   const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; };
 
   return (
@@ -33,16 +47,27 @@ export default function PatientDashboard() {
         <p className="text-stone-500 text-sm mt-1">{new Date().toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
       </div>
 
-      {/* Current mood banner */}
-      {latestMood && (
-        <div className="bg-gradient-to-r from-sage-50 to-warm-50 border border-sage-100 rounded-2xl p-4 mb-6 flex items-center gap-4">
-          <span className="text-4xl">{MOOD_EMOJI[latestMood.mood]}</span>
-          <div>
-            <p className="text-xs text-stone-400 font-semibold uppercase tracking-wide">Last Check-in</p>
-            <p className="font-display font-semibold text-stone-800 capitalize">{latestMood.mood}</p>
-            {latestMood.note && <p className="text-xs text-stone-500 mt-0.5 italic">"{latestMood.note}"</p>}
-          </div>
-          <Link to="/patient/mood" className="ml-auto text-xs btn-primary">Check in now</Link>
+      {/* Care Package Notifications */}
+      {unreadPackages.length > 0 && (
+        <div className="mb-6 space-y-3">
+          {unreadPackages.map(pkg => (
+            <div key={pkg._id} className="bg-gradient-to-r from-warm-50 to-amber-50 border border-warm-200 rounded-2xl p-5">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-warm-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <RiGiftLine className="text-warm-600 text-2xl" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-display font-bold text-stone-800 text-base">🎁 Care Package from {pkg.therapist?.name || 'Your Therapist'}</p>
+                  <p className="text-stone-600 text-sm mt-1 leading-relaxed">{pkg.message}</p>
+                  <p className="text-xs text-stone-400 mt-2">{pkg.createdAt ? new Date(pkg.createdAt).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</p>
+                </div>
+                <button onClick={() => handleReadPackage(pkg._id)}
+                  className="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-warm-700 bg-warm-100 hover:bg-warm-200 px-3 py-1.5 rounded-lg transition-colors">
+                  <RiCheckLine /> Mark read
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -64,7 +89,7 @@ export default function PatientDashboard() {
       </div>
 
       {/* Recent journal entries */}
-      <div className="card p-5">
+      <div className="card p-5 mb-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display font-semibold text-stone-800">Recent Journal Entries</h2>
           <Link to="/patient/journal" className="text-xs text-sage-600 hover:underline font-semibold">View all</Link>
@@ -87,6 +112,21 @@ export default function PatientDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Past care packages */}
+      {carePackages.filter(p => p.read).length > 0 && (
+        <div className="card p-5">
+          <h2 className="font-display font-semibold text-stone-800 mb-3">Past Care Packages 🎁</h2>
+          <div className="space-y-2">
+            {carePackages.filter(p => p.read).slice(0, 3).map(pkg => (
+              <div key={pkg._id} className="p-3 bg-stone-50 rounded-xl">
+                <p className="text-sm text-stone-600 italic">"{pkg.message}"</p>
+                <p className="text-xs text-stone-400 mt-1">From {pkg.therapist?.name} · {pkg.createdAt ? new Date(pkg.createdAt).toLocaleDateString('en-PH') : ''}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
